@@ -1,13 +1,13 @@
-import { FETCH_ARTIST } from '../actions/types'
+import { FETCH_ARTIST_AND_TRACKS } from '../actions/types'
 const initialState = {
-    artist: null
+    artist: null,
+    tracks:[]
 }
-export const rootReducer = (state = initialState, { type, payload }) => {
+export const rootReducer = (state = initialState,{type,payload}) => {
     switch (type) {
-        case FETCH_ARTIST:
-            return { ...state, artist: payload }
-        case "TEST_ACTION":
-            return { ...state, testState: payload }
+        case FETCH_ARTIST_AND_TRACKS:
+            console.log("PAYLOAD",payload)
+        return { ...state, artist: payload.artistObj ,tracks:payload.trackObj }
         default:
             return state
     }

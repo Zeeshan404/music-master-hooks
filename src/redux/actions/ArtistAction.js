@@ -1,18 +1,7 @@
-
-
-import { FETCH_ARTIST } from './types'
-// const API_ADDRESS = "https://spotify-api-wrapper.appspot.com";
-
+import { FETCH_ARTIST_AND_TRACKS } from './types'
 export const fetchArtist = () => {
-    return { type: FETCH_ARTIST, artist: artistObj }
+    return { type: FETCH_ARTIST_AND_TRACKS, payload: { artistObj, trackObj } }
 }
-
-export const testAction =()=>{
-    return {type:"TEST_ACTION", testState:"TESTING STRING"}
-}
-
-
-
 const artistObj = {
     "external_urls": {
         "spotify": "https://open.spotify.com/artist/7vk5e3vY1uw9plTHJAMwjN"
@@ -902,6 +891,8 @@ const trackObj = [{
     "type": "track",
     "uri": "spotify:track:22O2Zdfj3jnJZDSzlDMAJp"
 }]
+// const API_ADDRESS = "https://spotify-api-wrapper.appspot.com";
+
     // fetch(`${API_ADDRESS}/artist/Justin`)
     //     .then(response => response.json())
     //     .then(json => { dispatch(artistConstant.FETCH_ARTIST,json) })

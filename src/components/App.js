@@ -1,44 +1,27 @@
 import React, { useState, useEffect } from "react";
 import Search from "./Search";
 import Artist from "./Artist";
-// import Tracks from "./Tracks";
+import Tracks from "./Tracks";
 import { connect } from 'react-redux';
-import { fetchArtist, testAction } from '../redux/actions/ArtistAction';
+import { fetchArtist } from '../redux/actions/ArtistAction';
 
-// const API_ADDRESS = "https://spotify-api-wrapper.appspot.com";
 
 const App = (props) => {
-
-  const [artist, setArtist] = useState(props.artist)
-  const [tracks, setTracks] = useState([])
-  const { artistprops, fetchArtist ,testAction } = props
+  const { artist, tracks, fetchArtist } = props
   useEffect(() => {
-    // dispatch(artistActions.fetchArtist)
-    // fetchArtist;
-    console.log("PROPS", props)
-    
+    searchArtist();
   })
-  console.log("PROPS", props)
-
-  // console.log("Artist", artist)
-  // console.log("Tracks", tracks)
-
-
-
-
-
 
   function searchArtist(artistQuery) {
-
+    fetchArtist()
   };
 
   return (
     <div>
       <h2> Music Master </h2>
-      <Search searchArtist={searchArtist} />
-      <Artist artist={artist} />
-      <button onClick={testAction}>CLICKME!</button>
-      {/* <Tracks tracks={tracks} /> */}
+      <Search />
+      <Artist />
+      <Tracks tracks={tracks} />
     </div>
   );
 }
@@ -47,14 +30,21 @@ const App = (props) => {
 
 
 const mapStatetoProps = state => {
-  return { artist: state.artist }
-}
-const mapDispatchtoProps = dispatch => {
-  return { 
-    fetchArtist: () => dispatch(fetchArtist()) ,
-    testAction: () => dispatch(testAction()) 
-
+  return {
+    artist: state.artist,
+    tracks: state.tracks
   }
 }
-const componentConnector = connect(mapStatetoProps, mapDispatchtoProps)
-export default componentConnector(App);
+const mapDispatchtoProps = dispatch => {
+  return {
+    fetchArtist: () => dispatch(fetchArtist()),
+  }
+}
+
+export default connect(mapStatetoProps, mapDispatchtoProps)(App);
+// const componentConnector = connect(mapStatetoProps, mapDispatchtoProps)
+// export default componentConnector(App);
+// export default connect(
+//   state=>({artist:state.artist,tracks:state.tracks}),
+//   {fetchArtist}
+// )(App)
