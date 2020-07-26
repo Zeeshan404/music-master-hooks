@@ -15,7 +15,6 @@ const Tracks = ( {tracks}) => {
   useEffect((prevProps) => {
       setTracksQuery("");
       setFliterArray([]);
-      console.log("TIMEs........");
   },[tracks])
 
   function updateTrackQuery(e) {
