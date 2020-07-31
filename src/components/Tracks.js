@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Pagination from "react-pagination-js";
 import "react-pagination-js/dist/styles.css";
-const Tracks = ( {tracks}) => {
-
+import { connect } from "react-redux";
+import {fetchTracks} from '../redux/actions/TrackAction';
+const Tracks = ( props ) => {
+  const { tracks, fetchTracks } = props;
+  console.log("TRACKS PROPS",props)
   const [playing, setPlaying] = useState(false);
   const [audio, setAudio] = useState(null);
   const [playingPreviewUrl, setPlayingPreviewUrl] = useState(null);
@@ -12,10 +15,11 @@ const Tracks = ( {tracks}) => {
   const [fliterArray, setFliterArray] = useState([]);
 
 
-  useEffect((prevProps) => {
-      setTracksQuery("");
-      setFliterArray([]);
-  },[tracks])
+  useEffect(() => {
+      fetchTracks()
+      // setTracksQuery("");
+      // setFliterArray([]);
+  },[])
 
   function updateTrackQuery(e) {
     setCurrentPage(1);
@@ -36,24 +40,25 @@ const Tracks = ( {tracks}) => {
     setCurrentPage(numPage)
   };
 
-  // function playAudio(previewUrl) {
-  //   const audio = new Audio(previewUrl);
-  //   if (!playing) {
-  //     audio.play();
-  //     setPlaying(true)
-  //     setAudio(audio)
-  //     setPlayingPreviewUrl(previewUrl)
-  //   } else {
-  //     audio.pause();
-  //     if (playingPreviewUrl === previewUrl) {
-  //       setPlaying(false)
-  //     } else {
-  //       audio.play();
-  //       setAudio(audio)
-  //       setPlayingPreviewUrl(previewUrl)
-  //     }
-  //   }
-  // };
+  function playAudio(previewUrl) {
+     
+    // const audio = new Audio(previewUrl);
+    // if (!playing) {
+    //   audio.play();
+    //   setPlaying(true)
+    //   setAudio(audio)
+    //   setPlayingPreviewUrl(previewUrl)
+    // } else {
+    //   audio.pause();
+    //   if (playingPreviewUrl === previewUrl) {
+    //     setPlaying(false)
+    //   } else {
+    //     audio.play();
+    //     setAudio(audio)
+    //     setPlayingPreviewUrl(previewUrl)
+    //   }
+    // }
+  };
 
   function trackIcon(track) {
     if (!track.preview_url) {
@@ -67,21 +72,21 @@ const Tracks = ( {tracks}) => {
 
   let paginateTracks = [];
   const endIndex = sizePerPage * currentPage;
-  if (fliterArray.length) {
-    tracks = fliterArray;
-  }
-  else if (tracksQuery != '' && fliterArray.length == 0) {
-    tracks = [];
-  }
+  // if (fliterArray.length) {
+  //   tracks = fliterArray;
+  // }
+  // else if (tracksQuery != '' && fliterArray.length == 0) {
+  //   tracks = [];
+  // }
   paginateTracks = tracks.slice(endIndex - sizePerPage, endIndex);
   return (
     <div>
       <hr />
-      <input
+      {/* <input
         id="TracksSearch"
         onChange={updateTrackQuery}
         placeholder="Search for a track"
-        value={tracksQuery} />
+        value={tracksQuery} /> */}
       <br />
       {paginateTracks.length ? (
         <div>
@@ -90,8 +95,8 @@ const Tracks = ( {tracks}) => {
             return (
               <div
                 key={id}
-                // onClick={playAudio(preview_url)}
-                onClick={()=>{alert('Play Audio')}}
+                onClick={playAudio(preview_url)}
+                // onClick={()=>{alert('Play Audio')}}
                 className="track">
                 <img
                   src={album.images[0].url}
@@ -119,4 +124,17 @@ const Tracks = ( {tracks}) => {
   );
 }
 
-export default Tracks;
+
+const mapStatetoProps = state => {
+  const {tracks} = state.TrackReducer
+  return {
+    tracks
+  }
+}
+const mapDispatchtoProps = dispatch => {
+  return { 
+    fetchTracks: () => dispatch(fetchTracks()),
+  }
+}
+
+export default connect(mapStatetoProps,mapDispatchtoProps)(Tracks);
