@@ -1,4 +1,4 @@
-import { FETCH_ARTIST } from '../actions/types'
+import { FETCH_ARTIST, SET_LOADING } from '../actions/types'
 const artistObj = {
     "external_urls": {
         "spotify": "https://open.spotify.com/artist/7vk5e3vY1uw9plTHJAMwjN"
@@ -32,11 +32,14 @@ const artistObj = {
 
 const initialState = {
     artist: artistObj,
+    loading: false
 }
 export default (state = initialState, { type, payload }) =>{
     switch (type) {
         case FETCH_ARTIST:
-            return { ...state, artist: payload.artist }
+            return { ...state, artist: payload.artist , loading : payload.loading }
+        case SET_LOADING:
+            return { ...state, loading: payload.loading }
         default:
             return state
     }

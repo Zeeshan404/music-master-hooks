@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import {connect} from 'react-redux';
 import {searchArtist} from '../redux/actions/ArtistAction';
 
+
 const Search = (props) => {
   const [ artistQuery, setArtistQuery ] = useState("");
-  // useEffect(()=>{
-  //   console.log("Props", props)
-  // })
   const { searchArtist } = props;
+
   const  updateArtistQuery = e => {
     setArtistQuery(e.target.value);
   };
@@ -20,7 +19,10 @@ const Search = (props) => {
 
 const searchArtistLocal =()=>{
   if(artistQuery!="")
+  // setLoading(true)
   searchArtist(artistQuery)
+  
+  
 }
 
 
@@ -32,16 +34,16 @@ const searchArtistLocal =()=>{
         value={artistQuery}
         placeholder='Search for an Artist'
       />
-      <button onClick={searchArtistLocal}>Search</button>
+      <button onClick={searchArtistLocal}>Search</button>      
     </div>
   )
 }
 
 
 const mapStatetoProps = state => {
-  const { artistQuery } = state.ArtistReducer;
+  const { artist } = state.ArtistReducer;
   return {
-    artistQuery,
+    artist,
   }
 }
 const mapDispatchtoProps = dispatch => {

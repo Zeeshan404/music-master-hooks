@@ -1,17 +1,26 @@
-import { FETCH_ARTIST, API_ADDRESS  } from './types'
+import { FETCH_ARTIST, API_ADDRESS ,SET_LOADING  } from './types'
 
 
 export const fetchArtist = (json) => {
     const artist = json.artists.items[0];
-    return { type: FETCH_ARTIST, payload: { artist } }
+    return { type: FETCH_ARTIST, payload: { artist , loading: false } }
 }
 
 export const searchArtist = (artistQuery,dispatch) => {
+    dispatch({ type: SET_LOADING, payload: { loading: true } });
     fetch(`${API_ADDRESS}/artist/${artistQuery}`)
         .then(response => response.json())
-        .then(json => {dispatch(fetchArtist(json))})
-        .catch(error => alert(error.message));
+        .then(json => {
+            dispatch(fetchArtist(json))
+        })
+        .catch(error => {
+            dispatch({ type: SET_LOADING, payload: { loading: false } });
+            alert(error.message)});
+
 };
+
+
+
 
 
     // fetch(`${API_ADDRESS}/artist/${artistQuery}`)
