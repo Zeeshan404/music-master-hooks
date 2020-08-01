@@ -1,34 +1,55 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
+import {connect} from 'react-redux';
+import {searchArtist} from '../redux/actions/ArtistAction';
 
-class Search extends Component {
-  state = { artistQuery: '' };
-
-  updateArtistQuery = event => {
-    this.setState({ artistQuery: event.target.value });
+const Search = (props) => {
+  const [ artistQuery, setArtistQuery ] = useState("");
+  // useEffect(()=>{
+  //   console.log("Props", props)
+  // })
+  const { searchArtist } = props;
+  const  updateArtistQuery = e => {
+    setArtistQuery(e.target.value);
   };
 
-  handleKeyPress = event => {
-    if (event.key === 'Enter') {
-      this.searchArtist();
+  const handleKeyPress = e => {
+    if (e.key === 'Enter') {
+      searchArtistLocal()
     }
   };
 
-  searchArtist = () => {
-    this.props.searchArtist(this.state.artistQuery);
-  };
+const searchArtistLocal =()=>{
+  if(artistQuery!="")
+  searchArtist(artistQuery)
+}
 
-  render() {
-    return (
-      <div>
-        <input
-          onChange={this.updateArtistQuery}
-          onKeyPress={this.handleKeyPress}
-          placeholder='Search for an Artist'
-        />
-        <button onClick={this.searchArtist}>Search</button>
-      </div>
-    )
+
+  return (
+    <div>
+      <input
+        onChange={updateArtistQuery}
+        onKeyPress={handleKeyPress}
+        value={artistQuery}
+        placeholder='Search for an Artist'
+      />
+      <button onClick={searchArtistLocal}>Search</button>
+    </div>
+  )
+}
+
+
+const mapStatetoProps = state => {
+  const { artistQuery } = state.ArtistReducer;
+  return {
+    artistQuery,
+  }
+}
+const mapDispatchtoProps = dispatch => {
+  return {
+    searchArtist: (artistQuery) => searchArtist(artistQuery,dispatch),
   }
 }
 
-export default Search;
+export default connect(mapStatetoProps, mapDispatchtoProps)(Search);
+
+

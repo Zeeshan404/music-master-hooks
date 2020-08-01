@@ -1,14 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
-import { fetchArtist } from '../redux/actions/ArtistAction'
 const Artist = (props) => {
-  const { artist, fetchArtist } = props;
-  // console.log("Artist PROPS",props)
-
-  useEffect(() => {
-    fetchArtist();
-  }, [])
-
+  const { artist } = props;
   if (!artist) return null;
   const { images, name, followers, genres } = artist;
   return (
@@ -30,7 +23,6 @@ const mapStatetoProps = state => {
 }
 const mapDispatchtoProps = dispatch => {
   return {
-    fetchArtist: () => dispatch(fetchArtist()),
   }
 }
 

@@ -863,7 +863,6 @@ const trackObj = [{
 
 export const fetchTracks = () => {
     console.log("TRK Action")
-
     return { type: FETCH_TRACKS, payload: { trackObj } }
 }
 
@@ -875,21 +874,6 @@ export const fetchTracks = () => {
 
 
 
-
-
-
-
-
-
-
-
-
-// const API_ADDRESS = "https://spotify-api-wrapper.appspot.com";
-
-    // fetch(`${API_ADDRESS}/artist/Justin`)
-    //     .then(response => response.json())
-    //     .then(json => { dispatch(artistConstant.FETCH_ARTIST,json) })
-    //     .catch(error => alert(error.message));
 
 
 
