@@ -1,33 +1,49 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Pagination from "react-pagination-js";
 import "react-pagination-js/dist/styles.css";
 import { connect } from "react-redux";
 import {fetchTracks} from '../redux/actions/TrackAction';
+// const useStateMerger = (state,change)=>{
+//   const[state,setState] = useState({...state ,change})
+//   return state;
+// }
+// const [state,setState] = useState((state)=>{return {...state , ...updatedValues}})
+
 const Tracks = ( props ) => {
-  const { tracks, fetchTracks } = props;
-  console.log("TRACKS PROPS",props)
-  const [playing, setPlaying] = useState(false);
-  const [audio, setAudio] = useState(null);
-  const [playingPreviewUrl, setPlayingPreviewUrl] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sizePerPage, setSizePerPage] = useState(5);
-  const [tracksQuery, setTracksQuery] = useState("");
-  const [fliterArray, setFliterArray] = useState([]);
+  const [state, setState] = useState({
+    playing: false,
+    audio: null,
+    playingPreviewUrl: null,
+    currentPage: 1,
+    sizePerPage: 4,
+    fliterArray: []
+  })
+  const [tracksQuery, setTrackQuery] = useState("")
+  const { tracks } = props;
+  const { playing, audio, playingPreviewUrl, currentPage, sizePerPage, fliterArray } = state;
+  
 
-
-  useEffect(() => {
-      fetchTracks()
-      // setTracksQuery("");
-      // setFliterArray([]);
-  },[])
+  // useEffect(() => {
+  //     // fetchTracks()
+  //     // setTracksQuery("");
+  //     // setFliterArray([]);
+  // },[])
 
   function updateTrackQuery(e) {
-    setCurrentPage(1);
-    setTracksQuery(e)
+    // console.log("event",e.target.value)
+    setTrackQuery(e.target.value)
+    // tracksQuery = e.target.value;
+    // this.state.tracksQuery = e.target.value;
+    setState({...state , currentPage : 1})
     if (tracksQuery === "") {
-      setFliterArray([])
-    } else searchTracks();
+      setState({...state,fliterArray:[]})
+    } 
+    
+    // else { 
+    //   searchTracks();
+    // }
   };
+console.log("STATE", state)
 
   function searchTracks() {
     fliterArray = tracks.filter(
@@ -37,29 +53,26 @@ const Tracks = ( props ) => {
   };
 
   function changeCurrentPage(numPage) {
-    setCurrentPage(numPage)
+    setState({...state ,currentPage:numPage})
   };
 
   function playAudio(previewUrl) {
-     
-    // const audio = new Audio(previewUrl);
-    // if (!playing) {
-    //   audio.play();
-    //   setPlaying(true)
-    //   setAudio(audio)
-    //   setPlayingPreviewUrl(previewUrl)
-    // } else {
-    //   audio.pause();
-    //   if (playingPreviewUrl === previewUrl) {
-    //     setPlaying(false)
-    //   } else {
-    //     audio.play();
-    //     setAudio(audio)
-    //     setPlayingPreviewUrl(previewUrl)
-    //   }
-    // }
+    const localAudio = new Audio(previewUrl);
+    if (!playing) {
+      localAudio.play()
+      setState({...state , playing:true ,audio:localAudio, playingPreviewUrl:previewUrl})
+    }
+     else {
+      audio.pause();
+      if (playingPreviewUrl === previewUrl) {
+        setState({...state , playing:false })
+      } else {
+        localAudio.play();
+        setState({...state ,audio:localAudio, playingPreviewUrl:previewUrl})
+      }
+    }
   };
-
+console.log("TRACKS QUERY", tracksQuery)
   function trackIcon(track) {
     if (!track.preview_url) {
       return <span> N / A </span>;
@@ -82,11 +95,11 @@ const Tracks = ( props ) => {
   return (
     <div>
       <hr />
-      {/* <input
+      <input
         id="TracksSearch"
         onChange={updateTrackQuery}
         placeholder="Search for a track"
-        value={tracksQuery} /> */}
+        value={tracksQuery} />
       <br />
       {paginateTracks.length ? (
         <div>
@@ -95,8 +108,7 @@ const Tracks = ( props ) => {
             return (
               <div
                 key={id}
-                onClick={playAudio(preview_url)}
-                // onClick={()=>{alert('Play Audio')}}
+                onClick={()=>{playAudio(preview_url)}}
                 className="track">
                 <img
                   src={album.images[0].url}
@@ -138,3 +150,48 @@ const mapDispatchtoProps = dispatch => {
 }
 
 export default connect(mapStatetoProps,mapDispatchtoProps)(Tracks);
+
+
+// const PLAY = "PLAY"
+// const PLAY_IF_NOT_PLAYING ="PLAY_IF_NOT_PLAYING"
+// const PLAY_IF_ALREADY_PLAYING ="PLAY_IF_ALREADY_PLAYING"
+// const initialState = {
+//   playing: false,
+//   audio: null,
+//   playingPreviewUrl:null,
+//   currentPage:1,
+//   sizePerPage:4,
+//   tracksQuery:"",
+//   fliterArray:[]
+// };
+// const reducer = (state, {type,payload}) => {
+//   switch (type) {
+//     case PLAY:
+//       return { ...state, playing: payload.playing };
+//     case PLAY_IF_NOT_PLAYING:
+//       return { ...state, playing: payload.playing,audio: payload.audio , playingPreviewUrl : payload.playingPreviewUrl  };
+//     case PLAY_IF_ALREADY_PLAYING:
+//       return { ...state, audio: payload.audio, playingPreviewUrl: payload.playingPreviewUrl };
+//     default:
+//       return state;
+//   }
+// };
+// const [state, dispatch] = useReducer(reducer, initialState);
+// const { playing, audio, playingPreviewUrl, currentPage, sizePerPage, tracksQuery, fliterArray } = state;
+
+
+// if(!playing) {
+//   await audio.play();
+//   dispatch({ type: PLAY_IF_NOT_PLAYING, payload: { playing: true , audio: audio, playingPreviewUrl: previewUrl} })
+// }
+// else {
+//   if (playingPreviewUrl === previewUrl) {
+//     await audio.pause();
+//     dispatch({ type: PLAY, payload: { playing: false  } })
+
+//   }
+//   else {
+//     await audio.play();
+//     dispatch({ type: PLAY, payload: { audio: audio, playingPreviewUrl: previewUrl  } })
+//   }
+// }
