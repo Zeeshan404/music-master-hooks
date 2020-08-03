@@ -24,7 +24,7 @@ const Tracks = (props) => {
       didMount.current = true
       setPaginatedData()
     }
-  }, [tracksQuery, currentPage])
+  }, [tracksQuery, currentPage ,tracks])
 
   const searchTracks = async() => {
     if (tracksQuery == "") {
