@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Pagination from "react-pagination-js";
 import "react-pagination-js/dist/styles.css";
 import { connect } from "react-redux";
@@ -9,52 +9,53 @@ const Tracks = (props) => {
     audio: null,
     playingPreviewUrl: null,
     currentPage: 1,
-    sizePerPage: 3,
+    sizePerPage: 2,
     fliterArray: [],
   })
   let [tracksQuery, setTrackQuery] = useState("");
   let [paginateTracks, setPaginateTracks] = useState(props.tracks)
   let { tracks } = props;
   let { playing, audio, playingPreviewUrl, currentPage, sizePerPage, fliterArray } = state;
-
+  const didMount = useRef(false)
   useEffect(() => {
-    searchTracks()
-    setPaginatedData()
-  }, [tracksQuery])
+    if (didMount.current) {
+      searchTracks()
+    } else {
+      didMount.current = true
+      setPaginatedData()
+    }
+  }, [tracksQuery, currentPage])
 
-  const updateTrackQuery = (e) => {
-    setTrackQuery(e.target.value)
-  };
-  const searchTracks = () => {
+  const searchTracks = async() => {
     if (tracksQuery == "") {
-      setState((state) => ({ ...state, fliterArray: [] }))
+      fliterArray = []
+      setState((state) => ({ ...state, fliterArray }))
     }
     else {
       if (currentPage != 1) {
         changeCurrentPage(1)
       }
-      setFilterTracks()
-    }
-  };
-  const setFilterTracks = async() => {
-    let arr = await tracks.filter(track => track.name.toLowerCase().indexOf(tracksQuery.toLowerCase()) != -1)
-    console.log("STATE",arr)
-
+    let arr = await tracks.filter(track => track.name.toLowerCase().indexOf(tracksQuery.toLowerCase()) !== -1)
+    fliterArray = await arr
     setState((state) => ({ ...state, fliterArray:arr  }))
-    // setPaginatedData()
   }
+  setPaginatedData()
+  };
   const setPaginatedData = async () => {
-    const endIndex = sizePerPage * currentPage;
-    let arr = await paginateTracks.slice(endIndex - sizePerPage, endIndex);
-    // console.log("STATE",{...state,tracksQuery})
+    const endIndex = await sizePerPage * currentPage;
+    let arr = await tracks.slice(endIndex - sizePerPage, endIndex);
     if (fliterArray.length > 0) {
       arr = await fliterArray.slice(endIndex - sizePerPage, endIndex);
     }
     else if (tracksQuery != '' && fliterArray.length == 0) {
       arr = await[];
     }
+    paginateTracks = arr
     setPaginateTracks(arr)
   }
+  const updateTrackQuery = (e) => {
+    setTrackQuery(e.target.value)
+  };
   const changeCurrentPage = (numPage) => {
     setState((state) => ({ ...state, currentPage: numPage }))
   };
