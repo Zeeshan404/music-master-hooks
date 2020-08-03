@@ -1,79 +1,80 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Pagination from "react-pagination-js";
 import "react-pagination-js/dist/styles.css";
 import { connect } from "react-redux";
-import {fetchTracks} from '../redux/actions/TrackAction';
-// const useStateMerger = (state,change)=>{
-//   const[state,setState] = useState({...state ,change})
-//   return state;
-// }
-// const [state,setState] = useState((state)=>{return {...state , ...updatedValues}})
-
-const Tracks = ( props ) => {
-  const [state, setState] = useState({
+import { fetchTracks } from '../redux/actions/TrackAction';
+const Tracks = (props) => {
+  let [state, setState] = useState({
     playing: false,
     audio: null,
     playingPreviewUrl: null,
     currentPage: 1,
-    sizePerPage: 4,
-    fliterArray: []
+    sizePerPage: 3,
+    fliterArray: [],
   })
-  const [tracksQuery, setTrackQuery] = useState("")
-  const { tracks } = props;
-  const { playing, audio, playingPreviewUrl, currentPage, sizePerPage, fliterArray } = state;
-  
+  let [tracksQuery, setTrackQuery] = useState("");
+  let [paginateTracks, setPaginateTracks] = useState(props.tracks)
+  let { tracks } = props;
+  let { playing, audio, playingPreviewUrl, currentPage, sizePerPage, fliterArray } = state;
 
-  // useEffect(() => {
-  //     // fetchTracks()
-  //     // setTracksQuery("");
-  //     // setFliterArray([]);
-  // },[])
+  useEffect(() => {
+    searchTracks()
+    setPaginatedData()
+  }, [tracksQuery])
 
-  function updateTrackQuery(e) {
-    // console.log("event",e.target.value)
+  const updateTrackQuery = (e) => {
     setTrackQuery(e.target.value)
-    // tracksQuery = e.target.value;
-    // this.state.tracksQuery = e.target.value;
-    setState({...state , currentPage : 1})
-    if (tracksQuery === "") {
-      setState({...state,fliterArray:[]})
-    } 
-    
-    // else { 
-    //   searchTracks();
-    // }
   };
-console.log("STATE", state)
-
-  function searchTracks() {
-    fliterArray = tracks.filter(
-      track =>
-        track.name.toLowerCase().indexOf(tracksQuery.toLowerCase()) !== -1
-    );
+  const searchTracks = () => {
+    if (tracksQuery == "") {
+      setState((state) => ({ ...state, fliterArray: [] }))
+    }
+    else {
+      if (currentPage != 1) {
+        changeCurrentPage(1)
+      }
+      setFilterTracks()
+    }
   };
+  const setFilterTracks = async() => {
+    let arr = await tracks.filter(track => track.name.toLowerCase().indexOf(tracksQuery.toLowerCase()) != -1)
+    console.log("STATE",arr)
 
-  function changeCurrentPage(numPage) {
-    setState({...state ,currentPage:numPage})
+    setState((state) => ({ ...state, fliterArray:arr  }))
+    // setPaginatedData()
+  }
+  const setPaginatedData = async () => {
+    const endIndex = sizePerPage * currentPage;
+    let arr = await paginateTracks.slice(endIndex - sizePerPage, endIndex);
+    // console.log("STATE",{...state,tracksQuery})
+    if (fliterArray.length > 0) {
+      arr = await fliterArray.slice(endIndex - sizePerPage, endIndex);
+    }
+    else if (tracksQuery != '' && fliterArray.length == 0) {
+      arr = await[];
+    }
+    setPaginateTracks(arr)
+  }
+  const changeCurrentPage = (numPage) => {
+    setState((state) => ({ ...state, currentPage: numPage }))
   };
-
-  function playAudio(previewUrl) {
+  const playAudio = (previewUrl) => {
     const localAudio = new Audio(previewUrl);
     if (!playing) {
       localAudio.play()
-      setState({...state , playing:true ,audio:localAudio, playingPreviewUrl:previewUrl})
+      setState({ ...state, playing: true, audio: localAudio, playingPreviewUrl: previewUrl })
     }
-     else {
+    else {
       audio.pause();
       if (playingPreviewUrl === previewUrl) {
-        setState({...state , playing:false })
+        setState({ ...state, playing: false })
       } else {
         localAudio.play();
-        setState({...state ,audio:localAudio, playingPreviewUrl:previewUrl})
+        setState({ ...state, audio: localAudio, playingPreviewUrl: previewUrl })
       }
     }
   };
-console.log("TRACKS QUERY", tracksQuery)
-  function trackIcon(track) {
+  const trackIcon = (track) => {
     if (!track.preview_url) {
       return <span> N / A </span>;
     }
@@ -82,22 +83,19 @@ console.log("TRACKS QUERY", tracksQuery)
     }
     return <span> &#9654;</span>;
   };
+  const handleKeyPress = e => {
+    if (e.key === 'Enter') {
+      searchTracks()
+    }
+  };
 
-  let paginateTracks = [];
-  const endIndex = sizePerPage * currentPage;
-  // if (fliterArray.length) {
-  //   tracks = fliterArray;
-  // }
-  // else if (tracksQuery != '' && fliterArray.length == 0) {
-  //   tracks = [];
-  // }
-  paginateTracks = tracks.slice(endIndex - sizePerPage, endIndex);
-  return (
+ return (
     <div>
       <hr />
       <input
         id="TracksSearch"
         onChange={updateTrackQuery}
+        onKeyPress={handleKeyPress}
         placeholder="Search for a track"
         value={tracksQuery} />
       <br />
@@ -108,7 +106,7 @@ console.log("TRACKS QUERY", tracksQuery)
             return (
               <div
                 key={id}
-                onClick={()=>{playAudio(preview_url)}}
+                onClick={() => { playAudio(preview_url) }}
                 className="track">
                 <img
                   src={album.images[0].url}
@@ -138,18 +136,18 @@ console.log("TRACKS QUERY", tracksQuery)
 
 
 const mapStatetoProps = state => {
-  const {tracks} = state.TrackReducer
+  const { tracks } = state.TrackReducer
   return {
     tracks
   }
 }
 const mapDispatchtoProps = dispatch => {
-  return { 
+  return {
     fetchTracks: () => dispatch(fetchTracks()),
   }
 }
 
-export default connect(mapStatetoProps,mapDispatchtoProps)(Tracks);
+export default connect(mapStatetoProps, mapDispatchtoProps)(Tracks);
 
 
 // const PLAY = "PLAY"
@@ -195,3 +193,8 @@ export default connect(mapStatetoProps,mapDispatchtoProps)(Tracks);
 //     dispatch({ type: PLAY, payload: { audio: audio, playingPreviewUrl: previewUrl  } })
 //   }
 // }
+// const useStateMerger = (state,change)=>{
+//   const[state,setState] = useState({...state ,change})
+//   return state;
+// }
+// const [state,setState] = useState((state)=>{return {...state , ...updatedValues}})
