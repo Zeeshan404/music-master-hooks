@@ -84,11 +84,6 @@ const Tracks = (props) => {
     }
     return <span> &#9654;</span>;
   };
-  const handleKeyPress = e => {
-    if (e.key === 'Enter') {
-      searchTracks()
-    }
-  };
 
  return (
     <div>
@@ -96,7 +91,6 @@ const Tracks = (props) => {
       <input
         id="TracksSearch"
         onChange={updateTrackQuery}
-        onKeyPress={handleKeyPress}
         placeholder="Search for a track"
         value={tracksQuery} />
       <br />
